@@ -8,7 +8,7 @@ import Homepage from './pages/homepage/Homepage.component';
 import ShopPage from "./pages/shopPage/ShopPage.component"
 import Header from "./components/header/Header.component"
 import SignInSignUp from "./pages/Auth/Sign-in-sign-up.component"
-import { auth } from "./firebase/firebase.utils"
+import { auth, createUserProfileDocument } from "./firebase/firebase.utils"
 
 class App extends Component {
   constructor() {
@@ -20,9 +20,26 @@ class App extends Component {
 
   componentDidMount() {
     //this is a method from the firebase library that everytime the user changes in the database we will receive a new user. 
-    auth.onAuthStateChanged(user => {
-      this.setState({ currentUser: user })
+    this.unsusbscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      if (userAuth) {
+
+        //regardless of if the user is new or not, the createUser..... will return a userRef obj
+        const userRef = await createUserProfileDocument(userAuth)
+
+        //the userRef contains the id, an when you apply .data() you get the complete object that in the database
+        userRef.onSnapshot(snapShot => {
+          this.setState({
+            currentUser: {
+              id: snapShot.id,
+              ...snapShot.data()
+            }
+          }, () => console.log(this.state))
+        })
+
+      }
+      this.setState({ currentUser: userAuth })
     })
+
   }
 
   componentWillUnmount() {
