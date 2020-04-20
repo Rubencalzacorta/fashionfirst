@@ -6,7 +6,7 @@ import "./SignIn.styles.scss"
 import FormInput from "../form-input/FormInput.component.js"
 import CustomButton from "../custom-button/CustomButton.component"
 
-import { signInWithGoogle } from "../../firebase/firebase.utils"
+import { auth, signInWithGoogle } from "../../firebase/firebase.utils"
 
 class SignIn extends Component {
     constructor(props) {
@@ -25,13 +25,23 @@ class SignIn extends Component {
     }
 
 
-    handleSubmit = e => {
+    handleSubmit = async e => {
         e.preventDefault()
 
-        this.setState({
-            email: "",
-            password: ""
-        })
+        const { email, password } = this.state
+
+        try {
+            //as the user changes, it trigers the function in app. 
+            await auth.signInWithEmailAndPassword(email, password)
+
+            this.setState({
+                email: "",
+                password: ""
+            })
+
+        } catch (err) {
+            console.log("error signing in with email and password", err)
+        }
     }
 
 
@@ -52,7 +62,7 @@ class SignIn extends Component {
                     <FormInput
                         name="password"
                         type="password"
-                        value={this.state.email}
+                        value={this.state.password}
                         handleChange={this.handleChange}
                         label="Password"
                         required />

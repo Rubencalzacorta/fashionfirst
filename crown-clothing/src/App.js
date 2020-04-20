@@ -20,6 +20,7 @@ class App extends Component {
 
   componentDidMount() {
     //this is a method from the firebase library that everytime the user changes in the database we will receive a new user. 
+
     this.unsusbscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if (userAuth) {
 
@@ -33,7 +34,7 @@ class App extends Component {
               id: snapShot.id,
               ...snapShot.data()
             }
-          }, () => console.log(this.state))
+          })
         })
 
       }
